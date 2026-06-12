@@ -51,11 +51,32 @@ def lookup_plant(plant_name: str) -> dict:
     what information would actually be helpful to the agent.
 
     Before writing code, complete the lookup_plant section of specs/tool-functions-spec.md.
+    
     """
+    plant_name = plant_name.strip().lower()
+    
+    # 1. Direct key match
+    if plant_name in _plant_db:
+        return {"found": True, "plant": _plant_db[plant_name]}
+    
+    # 2. Display name match
+    for slug, plant in _plant_db.items():
+        if plant.get("display_name", "").strip().lower() == plant_name:
+            return {"found": True, "plant": plant}
+    
+    # 3. Alias match
+    for slug, plant in _plant_db.items():
+        if plant_name in [alias.strip().lower() for alias in plant.get("aliases", [])]:
+            return {"found": True, "plant": plant}
+    
     return {
         "found": False,
         "name": plant_name,
-        "message": "Plant lookup not yet implemented. Complete Milestone 1.",
+         "message": (
+            f"I couldn't find '{plant_name}' in my plant database. "
+            "Please check the spelling or ask about a different plant. "
+            "I only have information on specific houseplant varieties."
+        ),
     }
 
 
